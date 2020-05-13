@@ -6,9 +6,13 @@ defmodule Servy.Handler do
     |> format_response()
   end
 
-  def parse(_request) do
-    # TODO: parse the request into a map
-    %{method: "GET", path: "/wildthinks", body: ""}
+  def parse(request) do
+    [method, path, _] =
+      request
+      |> String.split("\n")
+      |> List.first()
+      |> String.split(" ")
+    %{method: method, path: path, body: ""}
   end
 
   def route(_conv) do
