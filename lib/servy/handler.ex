@@ -26,6 +26,10 @@ defmodule Servy.Handler do
     %{conv | body: "Teddy, Smokey, Paddington"}
   end
 
+  def route(%{method: _, path: path} = conv) do
+    %{conv | body: "No #{path} in here!"}
+  end
+
   def format_response(conv) do
     """
     HTTP/1.1 200 OK
