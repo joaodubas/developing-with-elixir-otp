@@ -15,19 +15,17 @@ defmodule Servy.Handler do
     %{method: method, path: path, body: ""}
   end
 
-  def route(_conv) do
-    # TODO: create a new map that also has the response body
-    %{method: "GET", path: "/wildthinks", body: "Bears, Lions, Tigers"}
+  def route(conv) do
+    %{conv | body: "Bears, Lions, Tigers"}
   end
 
-  def format_response(_conv) do
-    # TODO: use values in the map to create a HTTP response string
+  def format_response(conv) do
     """
     HTTP/1.1 200 OK
     Content-Type: text/html
-    Content-Length: 20
+    Content-Length: #{byte_size(conv[:body])}
 
-    Bears, Lions, Tigers
+    #{conv[:body]}
     """
   end
 end
