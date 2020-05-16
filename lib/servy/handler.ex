@@ -53,23 +53,27 @@ defmodule Servy.Handler do
   end
 
   def route(%{method: "GET", path: "/about"} = conv) do
-    file =
-      "../../priv/pages"
-      |> Path.expand(__DIR__)
-      |> Path.join("about.html")
-
-    case File.read(file) do
-      {:ok, content} ->
-        %{conv | body: content, status: 200}
-      {:error, :enoent} ->
-        %{conv | body: "File not found!", status: 404}
-      {:error, reason} ->
-        %{conv | body: "File error: #{reason}", status: 500}
-    end
+    "../../priv/pages"
+    |> Path.expand(__DIR__)
+    |> Path.join("about.html")
+    |> File.read()
+    |> handle_file(conv)
   end
 
   def route(%{method: _, path: path} = conv) do
     %{conv | body: "No #{path} in here!", status: 404}
+  end
+
+  def handle_file({:ok, content}, conv) do
+    %{conv | body: content, status: 200}
+  end
+
+  def handle_file({:error, :enoent}, conv) do
+    %{conv | body: "File not found!", status: 404}
+  end
+
+  def handle_file({:error, reason}, conv) do
+    %{conv | body: "File error: #{reason}", status: 500}
   end
 
   def track(%{status: 404, path: path} = conv) do
