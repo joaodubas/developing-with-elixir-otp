@@ -5,6 +5,7 @@ defmodule Servy.Handler do
     |> rewrite_path()
     |> log()
     |> route()
+    |> track()
     |> format_response()
   end
 
@@ -44,6 +45,13 @@ defmodule Servy.Handler do
   def route(%{method: _, path: path} = conv) do
     %{conv | body: "No #{path} in here!", status: 404}
   end
+
+  def track(%{status: 404, path: path} = conv) do
+    IO.puts "Warning: #{path} is on the loose"
+    conv
+  end
+
+  def track(conv), do: conv
 
   def format_response(conv) do
     """
