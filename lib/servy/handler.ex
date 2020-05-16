@@ -2,6 +2,7 @@ defmodule Servy.Handler do
   def handle(request) do
     request
     |> parse()
+    |> rewrite_path()
     |> log()
     |> route()
     |> format_response()
@@ -15,6 +16,12 @@ defmodule Servy.Handler do
       |> String.split(" ")
     %{method: method, path: path, body: "", status: nil}
   end
+
+  def rewrite_path(%{path: "/wildlife"} = conv) do
+    %{conv | path: "/wildthings"}
+  end
+
+  def rewrite_path(conv), do: conv
 
   def log(conv), do: IO.inspect conv
 
@@ -106,6 +113,17 @@ IO.puts response
 
 request = """
 GET /bigfoot HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.1
+Accept: */*
+
+"""
+
+response = Servy.Handler.handle(request)
+IO.puts response
+
+request = """
+GET /wildlife HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.1
 Accept: */*
