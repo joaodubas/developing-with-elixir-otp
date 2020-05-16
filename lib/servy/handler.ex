@@ -6,6 +6,7 @@ defmodule Servy.Handler do
     |> log()
     |> route()
     |> track()
+    |> emojify()
     |> format_response()
   end
 
@@ -56,6 +57,12 @@ defmodule Servy.Handler do
   end
 
   def track(conv), do: conv
+
+  def emojify(%{status: 200, body: body} = conv) do
+    %{conv | body: "😷 #{body} 😍"}
+  end
+
+  def emojify(conv), do: conv
 
   def format_response(conv) do
     """
