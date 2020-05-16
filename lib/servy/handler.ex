@@ -1,4 +1,6 @@
 defmodule Servy.Handler do
+  require Logger
+
   def handle(request) do
     request
     |> parse()
@@ -29,7 +31,10 @@ defmodule Servy.Handler do
 
   def rewrite_path(conv), do: conv
 
-  def log(conv), do: IO.inspect conv
+  def log(conv) do
+    Logger.debug("{method: #{conv.method}, path: #{conv.path}}")
+    conv
+  end
 
   def route(%{method: "GET", path: "/wildthings"} = conv) do
     %{conv | body: "Bears, Lions, Tigers", status: 200}
@@ -52,7 +57,7 @@ defmodule Servy.Handler do
   end
 
   def track(%{status: 404, path: path} = conv) do
-    IO.puts "Warning: #{path} is on the loose"
+    Logger.warn("{path: #{path}, message: is on the loose}")
     conv
   end
 
@@ -86,6 +91,8 @@ defmodule Servy.Handler do
   end
 end
 
+# ---
+
 request = """
 GET /wildthings HTTP/1.1
 Host: example.com
@@ -96,6 +103,8 @@ Accept: */*
 
 response = Servy.Handler.handle(request)
 IO.puts response
+
+# ---
 
 request = """
 GET /bears HTTP/1.1
@@ -108,6 +117,8 @@ Accept: */*
 response = Servy.Handler.handle(request)
 IO.puts response
 
+# ---
+
 request = """
 GET /bears/Teddy HTTP/1.1
 Host: example.com
@@ -118,6 +129,8 @@ Accept: */*
 
 response = Servy.Handler.handle(request)
 IO.puts response
+
+# ---
 
 request = """
 GET /bears?id=Grumpy HTTP/1.1
@@ -130,6 +143,8 @@ Accept: */*
 response = Servy.Handler.handle(request)
 IO.puts response
 
+# ---
+
 request = """
 DELETE /bears/Teddy HTTP/1.1
 Host: example.com
@@ -141,6 +156,8 @@ Accept: */*
 response = Servy.Handler.handle(request)
 IO.puts response
 
+# ---
+
 request = """
 GET /bigfoot HTTP/1.1
 Host: example.com
@@ -151,6 +168,8 @@ Accept: */*
 
 response = Servy.Handler.handle(request)
 IO.puts response
+
+# ---
 
 request = """
 GET /wildlife HTTP/1.1
