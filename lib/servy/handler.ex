@@ -1,5 +1,9 @@
 defmodule Servy.Handler do
+  @moduledoc "Servy HTTP handler requests/response."
+
   require Logger
+
+  @pages_path Path.expand("../../priv/pages", __DIR__)
 
   def handle(request) do
     request
@@ -53,16 +57,14 @@ defmodule Servy.Handler do
   end
 
   def route(%{method: "GET", path: "/about"} = conv) do
-    "../../priv/pages"
-    |> Path.expand(__DIR__)
+    @pages_path
     |> Path.join("about.html")
     |> File.read()
     |> handle_file(conv)
   end
 
   def route(%{method: "GET", path: "/pages/" <> page} = conv) do
-    "../../priv/pages"
-    |> Path.expand(__DIR__)
+    @pages_path
     |> Path.join("#{page}.html")
     |> File.read()
     |> handle_file(conv)
