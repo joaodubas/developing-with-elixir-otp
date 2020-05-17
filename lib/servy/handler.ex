@@ -3,8 +3,7 @@ defmodule Servy.Handler do
 
   import Servy.Middleware, only: [emojify: 1, log: 1, rewrite_path: 1, track: 1]
   import Servy.Parser, only: [parse: 1]
-
-  @pages_path Path.expand("../../priv/pages", __DIR__)
+  import Servy.Static, only: [handle_static: 2]
 
   def handle(request) do
     request
@@ -34,33 +33,15 @@ defmodule Servy.Handler do
   end
 
   def route(%{method: "GET", path: "/about"} = conv) do
-    @pages_path
-    |> Path.join("about.html")
-    |> File.read()
-    |> handle_file(conv)
+    handle_static("about.html", conv)
   end
 
   def route(%{method: "GET", path: "/pages/" <> page} = conv) do
-    @pages_path
-    |> Path.join("#{page}.html")
-    |> File.read()
-    |> handle_file(conv)
+    handle_static("#{page}.html", conv)
   end
 
   def route(%{method: _, path: path} = conv) do
     %{conv | body: "No #{path} in here!", status: 404}
-  end
-
-  def handle_file({:ok, content}, conv) do
-    %{conv | body: content, status: 200}
-  end
-
-  def handle_file({:error, :enoent}, conv) do
-    %{conv | body: "File not found!", status: 404}
-  end
-
-  def handle_file({:error, reason}, conv) do
-    %{conv | body: "File error: #{reason}", status: 500}
   end
 
   def format_response(conv) do
