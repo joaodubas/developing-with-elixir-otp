@@ -1,7 +1,8 @@
 defmodule Servy.Handler do
   @moduledoc "Servy HTTP handler requests/response."
 
-  require Logger
+  import Servy.Middleware, only: [emojify: 1, log: 1, rewrite_path: 1, track: 1]
+  import Servy.Parser, only: [parse: 1]
 
   @pages_path Path.expand("../../priv/pages", __DIR__)
 
@@ -14,30 +15,6 @@ defmodule Servy.Handler do
     |> track()
     |> emojify()
     |> format_response()
-  end
-
-  def parse(request) do
-    [method, path, _] =
-      request
-      |> String.split("\n")
-      |> List.first()
-      |> String.split(" ")
-    %{method: method, path: path, body: "", status: nil}
-  end
-
-  def rewrite_path(%{path: "/wildlife"} = conv) do
-    %{conv | path: "/wildthings"}
-  end
-
-  def rewrite_path(%{path: "/bears?id=" <> id} = conv) do
-    %{conv | path: "/bears/#{id}"}
-  end
-
-  def rewrite_path(conv), do: conv
-
-  def log(conv) do
-    Logger.debug("{method: #{conv.method}, path: #{conv.path}}")
-    conv
   end
 
   def route(%{method: "GET", path: "/wildthings"} = conv) do
@@ -85,19 +62,6 @@ defmodule Servy.Handler do
   def handle_file({:error, reason}, conv) do
     %{conv | body: "File error: #{reason}", status: 500}
   end
-
-  def track(%{status: 404, path: path} = conv) do
-    Logger.warn("{path: #{path}, message: is on the loose}")
-    conv
-  end
-
-  def track(conv), do: conv
-
-  def emojify(%{status: 200, body: body} = conv) do
-    %{conv | body: "😷 #{body} 😍"}
-  end
-
-  def emojify(conv), do: conv
 
   def format_response(conv) do
     """
