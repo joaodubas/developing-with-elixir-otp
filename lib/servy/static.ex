@@ -1,6 +1,6 @@
 defmodule Servy.Static do
 
-  @pages_path ["..", "..", "priv", "pages"] |> Path.join() |> Path.expand(__DIR__)
+  @pages_path Path.expand("priv/pages", File.cwd!())
 
   def handle_static(filename, conv) do
     @pages_path
