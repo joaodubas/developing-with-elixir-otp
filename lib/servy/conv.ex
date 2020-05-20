@@ -3,6 +3,7 @@ defmodule Servy.Conv do
     method: "",
     path: "",
     params: %{},
+    headers: %{},
     body: "",
     status: 0
   ]
