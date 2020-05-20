@@ -7,7 +7,7 @@ defmodule Servy.Parser do
     [general_header | headers_string] = String.split(request_line, "\n")
     [method, path, _protocol] = String.split(general_header, " ")
     headers = parse_headers(headers_string, %{})
-    params = parse_body(message_body)
+    params = parse_body(headers["Content-Type"], message_body)
     %Conv{method: method, path: path, params: params, headers: headers, body: "", status: nil}
   end
 
@@ -17,9 +17,11 @@ defmodule Servy.Parser do
 
   def parse_headers([], headers), do: headers
 
-  def parse_body(message) do
+  def parse_body("application/x-www-form-urlencoded", message) do
     message
     |> String.trim()
     |> URI.decode_query()
   end
+
+  def parse_body(_, _), do: %{}
 end
